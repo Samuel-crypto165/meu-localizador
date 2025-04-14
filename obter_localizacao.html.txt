@@ -52,7 +52,7 @@
         function enviarLocalizacao(latitude, longitude) {
             const statusDiv = document.getElementById('status');
             
-            fetch('https://seuservidor.com/receber_localizacao', {
+           fetch('https://seuusuario.pythonanywhere.com/receber_localizacao', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
