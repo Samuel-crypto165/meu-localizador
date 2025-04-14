@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Compartilhar Localização</title>
+</head>
+<body>
+    <h1>Compartilhe sua localização</h1>
+    <p>Clique no botão abaixo para compartilhar sua localização conosco.</p>
+    
+    <button onclick="obterLocalizacao()">Compartilhar Localização</button>
+    
+    <div id="status"></div>
+    
+    <script>
+        function obterLocalizacao() {
+            const statusDiv = document.getElementById('status');
+            
+            if (!navigator.geolocation) {
+                statusDiv.innerHTML = "Geolocalização não é suportada pelo seu navegador.";
+                return;
+            }
+            
+            statusDiv.innerHTML = "Obtendo localização...";
+            
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    // Sucesso - envia os dados para o servidor
+                    enviarLocalizacao(position.coords.latitude, position.coords.longitude);
+                },
+                function(error) {
+                    // Erro
+                    let mensagem = "Erro ao obter localização: ";
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            mensagem += "Usuário negou a solicitação de geolocalização.";
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            mensagem += "Informação de localização indisponível.";
+                            break;
+                        case error.TIMEOUT:
+                            mensagem += "A solicitação de localização expirou.";
+                            break;
+                        case error.UNKNOWN_ERROR:
+                            mensagem += "Ocorreu um erro desconhecido.";
+                            break;
+                    }
+                    statusDiv.innerHTML = mensagem;
+                }
+            );
+        }
+        
+        function enviarLocalizacao(latitude, longitude) {
+            const statusDiv = document.getElementById('status');
+            
+            fetch('https://seuservidor.com/receber_localizacao', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    latitude: latitude,
+                    longitude: longitude,
+                    timestamp: new Date().toISOString()
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                statusDiv.innerHTML = "Localização compartilhada com sucesso! Obrigado.";
+            })
+            .catch((error) => {
+                statusDiv.innerHTML = "Erro ao enviar localização: " + error;
+            });
+        }
+    </script>
+</body>
+</html>
